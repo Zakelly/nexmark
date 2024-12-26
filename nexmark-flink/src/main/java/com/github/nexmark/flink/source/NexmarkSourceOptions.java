@@ -150,6 +150,23 @@ public class NexmarkSourceOptions {
 		.longType()
 		.defaultValue(0L);
 
+	/**
+	 * @see NexmarkConfiguration#isSourceKeepAlive
+	 */
+	public static final ConfigOption<Boolean> KEEP_ALIVE = ConfigOptions
+			.key("keep-alive")
+			.booleanType()
+			.defaultValue(false);
+
+	/**
+	 * @see NexmarkConfiguration#isSourceKeepAlive
+	 */
+	public static final ConfigOption<Boolean> SOURCE_RESET = ConfigOptions
+			.key("source-reset")
+			.booleanType()
+			.defaultValue(false);
+
+
 
 	public static NexmarkConfiguration convertToNexmarkConfiguration(ReadableConfig config) {
 		NexmarkConfiguration nexmarkConf = new NexmarkConfiguration();
@@ -168,6 +185,8 @@ public class NexmarkSourceOptions {
 		nexmarkConf.hotBiddersRatio = config.get(BID_HOT_RATIO_BIDDERS);
 		nexmarkConf.hotSellersRatio = config.get(AUCTION_HOT_RATIO_SELLERS);
 		nexmarkConf.numEvents = config.get(EVENTS_NUM);
+		nexmarkConf.isSourceKeepAlive = config.get(KEEP_ALIVE);
+		nexmarkConf.isSourceReset = config.get(SOURCE_RESET);
 
 		return nexmarkConf;
 	}

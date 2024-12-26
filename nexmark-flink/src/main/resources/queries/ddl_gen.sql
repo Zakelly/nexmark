@@ -42,5 +42,7 @@ CREATE TABLE datagen (
     'events.num' = '${EVENTS_NUM}',
     'person.proportion' = '${PERSON_PROPORTION}',
     'auction.proportion' = '${AUCTION_PROPORTION}',
-    'bid.proportion' = '${BID_PROPORTION}'
+    'bid.proportion' = '${BID_PROPORTION}',
+    'keep-alive' = '${KEEP_ALIVE}',
+    'source-reset' = '${SOURCE_RESET}'
 );

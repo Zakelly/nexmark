@@ -266,6 +266,14 @@ public class GeneratorConfig implements Serializable {
       return baseTime + (long)(eventNumber * interEventDelayUs[0]) / 1000L;
   }
 
+  public boolean isSourceKeepAlive() {
+    return configuration.isSourceKeepAlive;
+  }
+
+  public boolean isSourceReset() {
+    return configuration.isSourceReset;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
