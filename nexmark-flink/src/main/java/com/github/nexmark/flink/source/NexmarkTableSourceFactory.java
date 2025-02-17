@@ -50,6 +50,7 @@ public class NexmarkTableSourceFactory implements DynamicTableSourceFactory {
 			System.currentTimeMillis(),
 			1,
 			nexmarkConf.numEvents,
+			nexmarkConf.stopAtEvent,
 			1);
 
 		return new NexmarkTableSource(generatorConfig);
@@ -84,7 +85,8 @@ public class NexmarkTableSourceFactory implements DynamicTableSourceFactory {
 		sets.add(NexmarkSourceOptions.AUCTION_HOT_RATIO_SELLERS);
 		sets.add(NexmarkSourceOptions.EVENTS_NUM);
 		sets.add(NexmarkSourceOptions.KEEP_ALIVE);
-		sets.add(NexmarkSourceOptions.SOURCE_RESET);
+		sets.add(NexmarkSourceOptions.IGNORE_STOP);
+		sets.add(NexmarkSourceOptions.STOP_AT);
 		return sets;
 	}
 }

@@ -42,6 +42,7 @@ public class WorkloadSuite {
 	private static final String EVENTS_NUM_CONF_SUFFIX = "." + NexmarkSourceOptions.EVENTS_NUM.key();
 	private static final String WARMUP_SUFFIX = ".warmup";
 	private static final String WARMUP_DURATION_SUFFIX = ".warmup.duration";
+	private static final String WARMUP_WITH_SAVEPOINT_SUFFIX = ".warmup.savepoint";
 	private static final String KAFKA_BOOTSTRAP_SERVERS = "kafka.bootstrap.servers";
 
 	private final Map<String, Workload> query2Workload;
@@ -131,8 +132,19 @@ public class WorkloadSuite {
 					WORKLOAD_SUITE_CONF_PREFIX + suiteName + WARMUP_SUFFIX + EVENTS_NUM_CONF_SUFFIX,
 					String.valueOf(eventsNum)));
 
+			boolean warmupWithSavepoint = Boolean.parseBoolean(confMap.getOrDefault(
+					WORKLOAD_SUITE_CONF_PREFIX + suiteName + WARMUP_WITH_SAVEPOINT_SUFFIX,
+					Boolean.FALSE.toString()));
+
+			if (kafkaServers != null && !kafkaServers.isEmpty()) {
+				warmupDuration = Duration.ZERO;
+				warmupTps = 0L;
+				warmupEventsNum = 0L;
+				warmupWithSavepoint = false;
+			}
+
 			Workload load = new Workload(
-					tps, eventsNum, personProportion, auctionProportion, bidProportion, kafkaServers, warmupDuration.toMillis(), warmupTps, warmupEventsNum);
+					tps, eventsNum, personProportion, auctionProportion, bidProportion, kafkaServers, warmupDuration.toMillis(), warmupTps, warmupEventsNum, warmupWithSavepoint);
 
 			String queriesKey = WORKLOAD_SUITE_CONF_PREFIX + suiteName + categoryQueries;
 			List<String> queries = new ArrayList<>();

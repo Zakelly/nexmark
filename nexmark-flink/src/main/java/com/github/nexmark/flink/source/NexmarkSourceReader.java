@@ -38,7 +38,7 @@ public class NexmarkSourceReader implements SourceReader<RowData, NexmarkSource.
     private final EventDeserializer<RowData> deserializer;
     private final Counter numRecordsInCounter;
     private final boolean isKeepAlive;
-    private final boolean resetEvents;
+    private final boolean ignoreStop;
     private NexmarkSource.NexmarkSourceSplit sourceSplit;
     private NexmarkGenerator generator;
 
@@ -47,7 +47,7 @@ public class NexmarkSourceReader implements SourceReader<RowData, NexmarkSource.
                         EventDeserializer<RowData> deserializer) {
         this.context = sourceReaderContext;
         this.isKeepAlive = config.isSourceKeepAlive();
-        this.resetEvents = config.isSourceReset();
+        this.ignoreStop = config.isSourceIgnoreStop();
         this.deserializer = deserializer;
         this.numRecordsInCounter = context.metricGroup().getIOMetricGroup().getNumRecordsInCounter();
     }
@@ -74,12 +74,13 @@ public class NexmarkSourceReader implements SourceReader<RowData, NexmarkSource.
         }
         readerOutput.collect(deserializer.deserialize(nextEvent.event));
         numRecordsInCounter.inc();
-        sourceSplit.setNumEmittedSoFar(generator.getEventsCountSoFar());
         return InputStatus.MORE_AVAILABLE;
     }
 
     @Override
     public List<NexmarkSource.NexmarkSourceSplit> snapshotState(long l) {
+        sourceSplit.setNumEmittedSoFar(generator.getEventsCountSoFar());
+        sourceSplit.setWallClockBaseTime(generator.getWallclockBaseTime());
         return Collections.singletonList(sourceSplit);
     }
 
@@ -92,11 +93,8 @@ public class NexmarkSourceReader implements SourceReader<RowData, NexmarkSource.
     public void addSplits(List<NexmarkSource.NexmarkSourceSplit> list) {
         Preconditions.checkState(list.size() == 1, "Only one split supported for one reader");
         Preconditions.checkState(sourceSplit == null, "We already have one split.");
-        NexmarkSource.NexmarkSourceSplit theOne = list.get(0);
-        if (theOne.getNumEmittedSoFar() == 0 || !resetEvents) {
-            sourceSplit = list.get(0);
-            generator = new NexmarkGenerator(sourceSplit.getGeneratorConfig(), sourceSplit.getNumEmittedSoFar(), -1);
-        }
+        sourceSplit = list.get(0);
+        generator = new NexmarkGenerator(sourceSplit.getGeneratorConfig(), sourceSplit.getNumEmittedSoFar(), -1, ignoreStop);
     }
 
     @Override

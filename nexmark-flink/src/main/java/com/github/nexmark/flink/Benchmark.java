@@ -100,6 +100,8 @@ public class Benchmark {
 		CpuMetricReceiver cpuMetricReceiver = new CpuMetricReceiver(reporterAddress, reporterPort);
 		cpuMetricReceiver.runServer();
 
+		String runnerVersion = nexmarkConf.get(FlinkNexmarkOptions.RUNNER_VERSION);
+
 		Duration monitorDelay = nexmarkConf.get(FlinkNexmarkOptions.METRIC_MONITOR_DELAY);
 		Duration monitorInterval = nexmarkConf.get(FlinkNexmarkOptions.METRIC_MONITOR_INTERVAL);
 		Duration monitorDuration = nexmarkConf.get(FlinkNexmarkOptions.METRIC_MONITOR_DURATION);
@@ -108,18 +110,34 @@ public class Benchmark {
 
 		// start to run queries
 		LinkedHashMap<String, JobBenchmarkMetric> totalMetrics = new LinkedHashMap<>();
-		executeQueries(
-				queries,
-				workloadSuite,
-				flinkRestClient,
-				cpuMetricReceiver,
-				monitorDelay,
-				monitorInterval,
-				monitorDuration,
-				location,
-				flinkDist,
-				totalMetrics,
-				category);
+
+		if (runnerVersion.equalsIgnoreCase("V2")) {
+			executeQueriesV2(
+					queries,
+					workloadSuite,
+					flinkRestClient,
+					cpuMetricReceiver,
+					monitorDelay,
+					monitorInterval,
+					monitorDuration,
+					location,
+					flinkDist,
+					totalMetrics,
+					category);
+		} else {
+			executeQueries(
+					queries,
+					workloadSuite,
+					flinkRestClient,
+					cpuMetricReceiver,
+					monitorDelay,
+					monitorInterval,
+					monitorDuration,
+					location,
+					flinkDist,
+					totalMetrics,
+					category);
+		}
 
 		// print benchmark summary
 		printSummary(totalMetrics);
@@ -194,6 +212,47 @@ public class Benchmark {
 							monitorDuration);
 			QueryRunner runner =
 					new QueryRunner(
+							queryName,
+							workload,
+							location,
+							flinkDist,
+							reporter,
+							flinkRestClient,
+							category);
+			JobBenchmarkMetric metric = runner.run();
+			totalMetrics.put(queryName, metric);
+		}
+	}
+
+	private static void executeQueriesV2(
+			List<String> queries,
+			WorkloadSuite workloadSuite,
+			FlinkRestClient flinkRestClient,
+			CpuMetricReceiver cpuMetricReceiver,
+			Duration monitorDelay,
+			Duration monitorInterval,
+			Duration monitorDuration,
+			Path location,
+			Path flinkDist,
+			LinkedHashMap<String, JobBenchmarkMetric> totalMetrics,
+			String category) {
+		for (String queryName : queries) {
+			Workload workload = workloadSuite.getQueryWorkload(queryName);
+			if (workload == null) {
+				throw new IllegalArgumentException(
+						String.format("The workload of query %s is not defined.", queryName));
+			}
+			workload.validateWorkload(monitorDuration);
+
+			MetricReporter reporter =
+					new MetricReporter(
+							flinkRestClient,
+							cpuMetricReceiver,
+							monitorDelay,
+							monitorInterval,
+							monitorDuration);
+			QueryRunnerV2 runner =
+					new QueryRunnerV2(
 							queryName,
 							workload,
 							location,

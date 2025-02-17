@@ -113,22 +113,28 @@ public class NexmarkGenerator implements Iterator<NexmarkGenerator.NextEvent>, S
   /** Wallclock time at which we emitted the first event (ms since epoch). Initially -1. */
   private long wallclockBaseTime;
 
-  public NexmarkGenerator(GeneratorConfig config, long eventsCountSoFar, long wallclockBaseTime) {
+  private boolean ignoreStop;
+
+  private long stopAt;
+
+  public NexmarkGenerator(GeneratorConfig config, long eventsCountSoFar, long wallclockBaseTime, boolean ignoreStop) {
     checkNotNull(config);
     this.config = config;
     this.eventsCountSoFar = eventsCountSoFar;
     this.wallclockBaseTime = wallclockBaseTime;
+    this.ignoreStop = ignoreStop;
+    this.stopAt = ignoreStop ? config.maxEvents : Math.min(config.stopAtEvent, config.maxEvents);
   }
 
   /** Create a fresh generator according to {@code config}. */
   public NexmarkGenerator(GeneratorConfig config) {
-    this(config, 0, -1);
+    this(config, 0, -1, true);
   }
 
   /** Return a deep copy of this generator. */
   public NexmarkGenerator copy() {
     checkNotNull(config);
-    return new NexmarkGenerator(config, eventsCountSoFar, wallclockBaseTime);
+    return new NexmarkGenerator(config, eventsCountSoFar, wallclockBaseTime, ignoreStop);
   }
 
   /**
@@ -138,22 +144,22 @@ public class NexmarkGenerator implements Iterator<NexmarkGenerator.NextEvent>, S
   public GeneratorConfig getCurrentConfig() {
     return config;
   }
-
-  /**
-   * Mutate this generator so that it will only generate events up to but not including {@code
-   * eventId}. Return a config to represent the events this generator will no longer yield. The
-   * generators will run in on a serial timeline.
-   */
-  public GeneratorConfig splitAtEventId(long eventId) {
-    long newMaxEvents = eventId - (config.firstEventId + config.firstEventNumber);
-    GeneratorConfig remainConfig =
-        config.copyWith(
-            config.firstEventId,
-            config.maxEvents - newMaxEvents,
-            config.firstEventNumber + newMaxEvents);
-    config = config.copyWith(config.firstEventId, newMaxEvents, config.firstEventNumber);
-    return remainConfig;
-  }
+//
+//  /**
+//   * Mutate this generator so that it will only generate events up to but not including {@code
+//   * eventId}. Return a config to represent the events this generator will no longer yield. The
+//   * generators will run in on a serial timeline.
+//   */
+//  public GeneratorConfig splitAtEventId(long eventId) {
+//    long newMaxEvents = eventId - (config.firstEventId + config.firstEventNumber);
+//    GeneratorConfig remainConfig =
+//        config.copyWith(
+//            config.firstEventId,
+//            config.maxEvents - newMaxEvents,
+//            config.firstEventNumber + newMaxEvents);
+//    config = config.copyWith(config.firstEventId, newMaxEvents, config.firstEventNumber);
+//    return remainConfig;
+//  }
 
   /**
    * Return the next 'event id'. Though events don't have ids we can simulate them to help with
@@ -165,7 +171,7 @@ public class NexmarkGenerator implements Iterator<NexmarkGenerator.NextEvent>, S
 
   @Override
   public boolean hasNext() {
-    return eventsCountSoFar < config.maxEvents;
+    return eventsCountSoFar < stopAt;
   }
 
   /**
@@ -227,6 +233,10 @@ public class NexmarkGenerator implements Iterator<NexmarkGenerator.NextEvent>, S
    */
   public long getEventsCountSoFar() {
     return eventsCountSoFar;
+  }
+
+  public long getWallclockBaseTime() {
+    return wallclockBaseTime;
   }
 
   @Override

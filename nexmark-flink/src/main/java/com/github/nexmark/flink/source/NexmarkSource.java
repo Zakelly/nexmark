@@ -84,11 +84,7 @@ public class NexmarkSource implements Source<RowData,
     public SplitEnumerator<NexmarkSourceSplit, Collection<NexmarkSourceSplit>> restoreEnumerator(
             SplitEnumeratorContext<NexmarkSourceSplit> splitEnumeratorContext,
             Collection<NexmarkSourceSplit> nexmarkSourceSplits) throws Exception {
-        if (config.isSourceReset()) {
-            return createEnumerator(splitEnumeratorContext);
-        } else {
-            return new StaticSplitEnumerator(splitEnumeratorContext, nexmarkSourceSplits);
-        }
+        return new StaticSplitEnumerator(splitEnumeratorContext, nexmarkSourceSplits);
     }
 
     @Override
@@ -181,6 +177,7 @@ public class NexmarkSource implements Source<RowData,
         private final String id;
         private final GeneratorConfig generatorConfig;
         private volatile long numEmittedSoFar;
+        private long wallClockBaseTime = -1L;
 
         NexmarkSourceSplit(String id, GeneratorConfig generatorConfig) {
             this.id = id;
@@ -201,8 +198,16 @@ public class NexmarkSource implements Source<RowData,
             return numEmittedSoFar;
         }
 
+        public long getWallClockBaseTime() {
+            return wallClockBaseTime;
+        }
+
         public void setNumEmittedSoFar(long numEmittedSoFar) {
             this.numEmittedSoFar = numEmittedSoFar;
+        }
+
+        public void setWallClockBaseTime(long wallClockBaseTime) {
+            this.wallClockBaseTime = wallClockBaseTime;
         }
     }
 

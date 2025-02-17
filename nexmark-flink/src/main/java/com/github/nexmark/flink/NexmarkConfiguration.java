@@ -143,7 +143,9 @@ public class NexmarkConfiguration implements Serializable {
 	/**
 	 * If true, the source will not recover from the previous checkpoint.
 	 */
-	@JsonProperty public boolean isSourceReset = false;
+	@JsonProperty public boolean isIgnoreStop = false;
+
+	@JsonProperty public long stopAtEvent = -1L;
 
 	/** Return full description as a string. */
 	@Override
@@ -189,7 +191,7 @@ public class NexmarkConfiguration implements Serializable {
 			rateShape == that.rateShape &&
 			rateUnit == that.rateUnit &&
 			isSourceKeepAlive == that.isSourceKeepAlive &&
-			isSourceReset == that.isSourceReset;
+			isIgnoreStop == that.isIgnoreStop;
 	}
 
 	@Override
@@ -224,6 +226,6 @@ public class NexmarkConfiguration implements Serializable {
 			probDelayedEvent,
 			outOfOrderGroupSize,
 			isSourceKeepAlive,
-			isSourceReset);
+				isIgnoreStop);
 	}
 }

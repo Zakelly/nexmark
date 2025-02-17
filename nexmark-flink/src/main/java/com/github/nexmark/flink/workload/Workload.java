@@ -39,9 +39,10 @@ public class Workload {
 	private final long warmupMills;
 	private final long warmupTps;
 	private final long warmupEvents;
+	private final boolean warmupWithSavepoint;
 
 	public Workload(long tps, long eventsNum, int personProportion, int auctionProportion, int bidProportion) {
-		this(tps, eventsNum, personProportion, auctionProportion, bidProportion, null, 0L, 0L, 0L);
+		this(tps, eventsNum, personProportion, auctionProportion, bidProportion, null, 0L, 0L, 0L, false);
 	}
 
 	public Workload(
@@ -53,7 +54,8 @@ public class Workload {
 			@Nullable String kafkaServers,
 			long warmupMills,
 			long warmupTps,
-			long warmupEvents) {
+			long warmupEvents,
+			boolean warmupWithSavepoint) {
 		this.tps = tps;
 		this.eventsNum = eventsNum;
 		this.personProportion = personProportion;
@@ -63,6 +65,7 @@ public class Workload {
 		this.warmupMills = warmupMills;
 		this.warmupTps = warmupTps;
 		this.warmupEvents = warmupEvents;
+		this.warmupWithSavepoint = warmupWithSavepoint;
 	}
 
 	public long getTps() {
@@ -99,6 +102,10 @@ public class Workload {
 
 	public long getWarmupEvents() {
 		return warmupEvents;
+	}
+
+	public boolean getWarmupWithSavepoint() {
+		return warmupWithSavepoint;
 	}
 
 	public void validateWorkload(Duration monitorDuration) {

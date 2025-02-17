@@ -16,27 +16,38 @@
  * limitations under the License.
  */
 
-package com.github.nexmark.flink.generator;
+package com.github.nexmark.flink.metric;
 
-import com.github.nexmark.flink.NexmarkConfiguration;
-import com.github.nexmark.flink.model.Event;
-import org.junit.Test;
+public class Savepoint {
 
-public class NexmarkGeneratorTest {
+    public enum Status {
+        /** Checkpoint that is still in progress. */
+        IN_PROGRESS,
+        /** Checkpoint that has successfully completed. */
+        COMPLETED,
+        /** Checkpoint that failed. */
+        FAILED;
+    }
 
-	@Test
-	public void testGenerate() {
-		NexmarkConfiguration nexmarkConfiguration = new NexmarkConfiguration();
-		nexmarkConfiguration.bidProportion = 46;
-		GeneratorConfig generatorConfig = new GeneratorConfig(
-			nexmarkConfiguration, System.currentTimeMillis(), 1, 100, 0L, 1);
-		NexmarkGenerator generator = new NexmarkGenerator(generatorConfig);
-		int count = 0;
-		while (generator.hasNext()) {
-			Event event = generator.next().event;
-			count ++;
-			System.out.println(event);
-		}
-		System.out.println("Total event:" + count);
-	}
+    private final Status status;
+
+    private final String path;
+
+    public Savepoint(Status status, String path) {
+        this.status = status;
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    @Override
+    public String toString() {
+        return "Savepoint{path = " + path + ", status = " + status + "}";
+    }
 }

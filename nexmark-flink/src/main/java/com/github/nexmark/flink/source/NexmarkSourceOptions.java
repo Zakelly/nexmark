@@ -159,12 +159,20 @@ public class NexmarkSourceOptions {
 			.defaultValue(false);
 
 	/**
-	 * @see NexmarkConfiguration#isSourceKeepAlive
+	 * @see NexmarkConfiguration#isIgnoreStop
 	 */
-	public static final ConfigOption<Boolean> SOURCE_RESET = ConfigOptions
-			.key("source-reset")
+	public static final ConfigOption<Boolean> IGNORE_STOP = ConfigOptions
+			.key("ignore-stop")
 			.booleanType()
 			.defaultValue(false);
+
+	/**
+	 * @see NexmarkConfiguration#isIgnoreStop
+	 */
+	public static final ConfigOption<Long> STOP_AT = ConfigOptions
+			.key("stop-at")
+			.longType()
+			.defaultValue(-1L);
 
 
 
@@ -186,7 +194,8 @@ public class NexmarkSourceOptions {
 		nexmarkConf.hotSellersRatio = config.get(AUCTION_HOT_RATIO_SELLERS);
 		nexmarkConf.numEvents = config.get(EVENTS_NUM);
 		nexmarkConf.isSourceKeepAlive = config.get(KEEP_ALIVE);
-		nexmarkConf.isSourceReset = config.get(SOURCE_RESET);
+		nexmarkConf.isIgnoreStop = config.get(IGNORE_STOP);
+		nexmarkConf.stopAtEvent = config.get(STOP_AT);
 
 		return nexmarkConf;
 	}
