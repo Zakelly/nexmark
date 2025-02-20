@@ -28,6 +28,13 @@ import java.time.Duration;
  */
 public class FlinkNexmarkOptions {
 
+
+	public static final ConfigOption<String> RUNNER_VERSION = ConfigOptions
+			.key("nexmark.runner.version")
+			.stringType()
+			.defaultValue("v1")
+			.withDescription("");
+
 	public static final ConfigOption<Duration> METRIC_MONITOR_DELAY = ConfigOptions
 		.key("nexmark.metric.monitor.delay")
 		.durationType()
