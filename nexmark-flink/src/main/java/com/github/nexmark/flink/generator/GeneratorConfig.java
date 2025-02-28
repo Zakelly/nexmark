@@ -89,6 +89,11 @@ public class GeneratorConfig implements Serializable {
    */
   private final long eventsPerEpoch;
 
+  /**
+   *
+   */
+  public final boolean maxEmitSpeed;
+
   public GeneratorConfig(
       NexmarkConfiguration configuration,
       long baseTime,
@@ -127,6 +132,8 @@ public class GeneratorConfig implements Serializable {
     long epochPeriodMs = 0;
     this.eventsPerEpoch = eventsPerEpoch;
     this.epochPeriodMs = epochPeriodMs;
+
+    this.maxEmitSpeed = configuration.maxEmitSpeed;
   }
 
   public GeneratorConfig reconfigure(GeneratorConfig configuration, boolean clearStopAtEvent) {
